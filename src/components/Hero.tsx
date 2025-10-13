@@ -10,9 +10,9 @@ const Hero = () => {
         <img 
           src={heroImage} 
           alt="AI Healthcare Technology" 
-          className="w-full h-full object-cover opacity-20"
+          className="w-full h-full object-cover opacity-30"
         />
-        <div className="absolute inset-0 bg-gradient-hero"></div>
+        <div className="absolute inset-0 bg-gradient-to-b from-background/95 via-background/90 to-background"></div>
       </div>
 
       {/* Content */}
@@ -31,7 +31,7 @@ const Hero = () => {
           </h1>
 
           {/* Subheading */}
-          <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
+          <p className="text-lg md:text-xl text-foreground/80 max-w-2xl mx-auto leading-relaxed font-medium">
             Bridging healthcare gaps with AI-driven disease detection, intelligent chatbots, and accessible medical services for everyone, everywhere.
           </p>
 
@@ -50,15 +50,15 @@ const Hero = () => {
           <div className="grid grid-cols-3 gap-6 pt-12 max-w-2xl mx-auto">
             <div className="text-center">
               <div className="text-3xl md:text-4xl font-bold text-primary">95%</div>
-              <div className="text-sm text-muted-foreground mt-1">Detection Accuracy</div>
+              <div className="text-sm text-foreground/70 mt-1 font-medium">Detection Accuracy</div>
             </div>
             <div className="text-center">
               <div className="text-3xl md:text-4xl font-bold text-primary">24/7</div>
-              <div className="text-sm text-muted-foreground mt-1">AI Support</div>
+              <div className="text-sm text-foreground/70 mt-1 font-medium">AI Support</div>
             </div>
             <div className="text-center">
               <div className="text-3xl md:text-4xl font-bold text-primary">1M+</div>
-              <div className="text-sm text-muted-foreground mt-1">Lives Impacted</div>
+              <div className="text-sm text-foreground/70 mt-1 font-medium">Lives Impacted</div>
             </div>
           </div>
         </div>

@@ -36,7 +36,7 @@ const HowItWorks = () => {
           <h2 className="text-3xl md:text-5xl font-bold text-foreground">
             How It <span className="text-primary">Works</span>
           </h2>
-          <p className="text-lg text-muted-foreground">
+          <p className="text-lg text-foreground/70 font-medium">
             Simple, fast, and effective healthcare powered by artificial intelligence
           </p>
         </div>
@@ -70,7 +70,7 @@ const HowItWorks = () => {
 
                   {/* Content */}
                   <h3 className="text-xl font-semibold text-foreground mb-2">{step.title}</h3>
-                  <p className="text-muted-foreground leading-relaxed">{step.description}</p>
+                  <p className="text-foreground/75 leading-relaxed">{step.description}</p>
                 </div>
               </div>
             );

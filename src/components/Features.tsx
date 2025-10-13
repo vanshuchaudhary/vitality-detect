@@ -40,7 +40,7 @@ const Features = () => {
           <h2 className="text-3xl md:text-5xl font-bold text-foreground">
             Intelligent Healthcare, <span className="text-primary">Simplified</span>
           </h2>
-          <p className="text-lg text-muted-foreground">
+          <p className="text-lg text-foreground/70 font-medium">
             Our AI-powered platform addresses critical healthcare challenges with cutting-edge technology
           </p>
         </div>
@@ -72,7 +72,7 @@ const Features = () => {
                       <Icon className="w-6 h-6" />
                     </div>
                     <h3 className="text-xl font-semibold text-foreground">{feature.title}</h3>
-                    <p className="text-muted-foreground leading-relaxed">{feature.description}</p>
+                    <p className="text-foreground/75 leading-relaxed">{feature.description}</p>
                   </div>
                 </CardContent>
               </Card>
