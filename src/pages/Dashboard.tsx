@@ -1,8 +1,7 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Activity, TrendingUp, Heart, Brain, Calendar, AlertCircle } from "lucide-react";
 import Navigation from "@/components/Navigation";
-import supabase from "../supabaseClient";
 
 interface HealthMetric {
   label: string;
@@ -27,60 +26,34 @@ interface ActivityLog {
 }
 
 const Dashboard = () => {
-  const [healthMetrics, setHealthMetrics] = useState<HealthMetric[]>([]);
-  const [predictions, setPredictions] = useState<Prediction[]>([]);
-  const [recentActivity, setRecentActivity] = useState<ActivityLog[]>([]);
-  const [loading, setLoading] = useState(true);
+  // Sample data for demonstration
+  const healthMetrics: HealthMetric[] = [
+    { label: "Health Score", value: 85, unit: "/100", icon: Activity, color: "text-green-500" },
+    { label: "Risk Level", value: "Low", icon: AlertCircle, color: "text-blue-500" },
+    { label: "Reports Analyzed", value: 12, icon: Brain, color: "text-purple-500" },
+    { label: "Days Active", value: 45, icon: Calendar, color: "text-orange-500" },
+  ];
 
-  useEffect(() => {
-    async function fetchDashboardData() {
-      try {
-        setLoading(true);
+  const predictions: Prediction[] = [
+    {
+      condition: "Cardiovascular Health",
+      probability: 15,
+      trend: "improving",
+      recommendation: "Continue regular exercise and maintain healthy diet",
+    },
+    {
+      condition: "Diabetes Risk",
+      probability: 28,
+      trend: "stable",
+      recommendation: "Monitor blood sugar levels and reduce sugar intake",
+    },
+  ];
 
-        // 1️⃣ Fetch health metrics (from patients table)
-        const { data: patientData, error: patientError } = await supabase
-          .from("patients")
-          .select("health_score, risk_level, reports_analyzed, days_active")
-          .limit(1);
-
-        if (patientError) console.error(patientError);
-
-        if (patientData && patientData.length > 0) {
-          const p = patientData[0];
-          setHealthMetrics([
-            { label: "Health Score", value: p.health_score || 0, unit: "/100", icon: Activity, color: "text-green-500" },
-            { label: "Risk Level", value: p.risk_level || "Unknown", icon: AlertCircle, color: "text-blue-500" },
-            { label: "Reports Analyzed", value: p.reports_analyzed || 0, icon: Brain, color: "text-purple-500" },
-            { label: "Days Active", value: p.days_active || 0, icon: Calendar, color: "text-orange-500" },
-          ]);
-        }
-
-        // 2️⃣ Fetch AI predictions
-        const { data: predictionsData, error: predictionsError } = await supabase
-          .from("predictions")
-          .select("condition, probability, trend, recommendation");
-
-        if (predictionsError) console.error(predictionsError);
-        else setPredictions(predictionsData || []);
-
-        // 3️⃣ Fetch recent activity
-        const { data: activityData, error: activityError } = await supabase
-          .from("activity_logs")
-          .select("date, type, status, risk")
-          .order("date", { ascending: false })
-          .limit(5);
-
-        if (activityError) console.error(activityError);
-        else setRecentActivity(activityData || []);
-      } catch (error) {
-        console.error("Error fetching dashboard data:", error);
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    fetchDashboardData();
-  }, []);
+  const recentActivity: ActivityLog[] = [
+    { date: "2025-10-12", type: "Blood Test Analysis", status: "Complete", risk: "Low" },
+    { date: "2025-10-10", type: "Health Checkup", status: "Complete", risk: "Low" },
+    { date: "2025-10-08", type: "AI Consultation", status: "Complete", risk: "Medium" },
+  ];
 
   return (
     <div className="min-h-screen bg-background">
@@ -96,12 +69,7 @@ const Dashboard = () => {
           </p>
         </div>
 
-        {/* Loading State */}
-        {loading ? (
-          <p className="text-center text-muted-foreground mt-10">Loading your health data...</p>
-        ) : (
-          <>
-            {/* Health Metrics */}
+        {/* Health Metrics */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
               {healthMetrics.map((metric, index) => {
                 const Icon = metric.icon;
@@ -241,8 +209,6 @@ const Dashboard = () => {
                 </CardContent>
               </Card>
             </div>
-          </>
-        )}
       </main>
     </div>
   );

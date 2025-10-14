@@ -1,33 +1,15 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Upload as UploadIcon, FileText, CheckCircle, AlertCircle, Brain } from "lucide-react";
 import Navigation from "@/components/Navigation";
 import { useToast } from "@/hooks/use-toast";
-import supabase from "../supabaseClient";
-
-interface Patient {
-  id: string;
-  name: string;
-}
 
 const Upload = () => {
   const [file, setFile] = useState<File | null>(null);
-  const [patients, setPatients] = useState<Patient[]>([]);
-  const [selectedPatient, setSelectedPatient] = useState<string>("");
   const [analyzing, setAnalyzing] = useState(false);
   const [results, setResults] = useState<any>(null);
   const { toast } = useToast();
-
-  // Fetch patients on mount
-  useEffect(() => {
-    async function fetchPatients() {
-      const { data, error } = await supabase.from("patients").select("id, name");
-      if (error) console.error(error);
-      else setPatients(data || []);
-    }
-    fetchPatients();
-  }, []);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -36,7 +18,7 @@ const Upload = () => {
     }
   };
 
-  const handleAnalyze = async () => {
+  const handleAnalyze = () => {
     if (!file) {
       toast({
         title: "No file selected",
@@ -45,56 +27,16 @@ const Upload = () => {
       });
       return;
     }
-    if (!selectedPatient) {
-      toast({
-        title: "No patient selected",
-        description: "Please select a patient",
-        variant: "destructive",
-      });
-      return;
-    }
 
     setAnalyzing(true);
 
-    // Upload file to Supabase Storage
-    const { data: storageData, error: storageError } = await supabase.storage
-      .from("reports")
-      .upload(`${selectedPatient}/${file.name}`, file);
-
-    if (storageError) {
-      console.error(storageError);
+    // Simulate AI analysis
+    setTimeout(() => {
       toast({
-        title: "Upload failed",
-        description: storageError.message,
-        variant: "destructive",
+        title: "Report analyzed",
+        description: "Your medical report has been analyzed successfully",
       });
-      setAnalyzing(false);
-      return;
-    }
-
-    // Insert metadata in reports table
-    const { error: dbError } = await supabase.from("reports").insert([
-      {
-        patient_id: selectedPatient,
-        report_name: file.name,
-        report_url: storageData?.path,
-        date: new Date(),
-      },
-    ]);
-
-    if (dbError) {
-      console.error(dbError);
-      toast({
-        title: "Failed to save report",
-        description: dbError.message,
-        variant: "destructive",
-      });
-    } else {
-      toast({
-        title: "Report uploaded",
-        description: "Your medical report has been saved successfully",
-      });
-      // Optional AI simulation
+      
       setResults({
         confidence: 94,
         findings: [
@@ -109,9 +51,9 @@ const Upload = () => {
           "Schedule follow-up with your physician in 3 months",
         ],
       });
-    }
 
-    setAnalyzing(false);
+      setAnalyzing(false);
+    }, 2000);
   };
 
   return (
@@ -136,20 +78,6 @@ const Upload = () => {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              {/* Patient selection */}
-              <select
-                value={selectedPatient}
-                onChange={(e) => setSelectedPatient(e.target.value)}
-                className="w-full border rounded-lg p-2"
-              >
-                <option value="">Select Patient</option>
-                {patients.map((p) => (
-                  <option key={p.id} value={p.id}>
-                    {p.name}
-                  </option>
-                ))}
-              </select>
-
               <div className="border-2 border-dashed border-border rounded-lg p-8 text-center hover:border-primary transition-colors">
                 <input
                   type="file"
@@ -181,7 +109,7 @@ const Upload = () => {
                 </div>
               )}
 
-              <Button variant="hero" className="w-full" onClick={handleAnalyze} disabled={!file || analyzing || !selectedPatient}>
+              <Button variant="hero" className="w-full" onClick={handleAnalyze} disabled={!file || analyzing}>
                 {analyzing ? (
                   <>
                     <Brain className="w-4 h-4 animate-pulse" />
