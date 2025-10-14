@@ -6,12 +6,15 @@ const BASE_URL = 'http://127.0.0.1:8000'; // FastAPI backend
 const Dashboard = () => {
   const [patients, setPatients] = useState<any[]>([]);
   const [prediction, setPrediction] = useState<number | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const fetchPatients = async () => {
       const { data, error } = await supabase.from('patients').select('*');
       if (error) {
         console.error('Supabase error:', error.message);
+        setError('Failed to fetch patients');
       } else {
         setPatients(data);
         console.log('Supabase data:', data);
@@ -21,7 +24,18 @@ const Dashboard = () => {
     fetchPatients();
   }, []);
 
-  const handlePredict = async (features: number[]) => {
+  const handlePredict = async (patient: any) => {
+    // Extract only numeric values from patient object
+    const features = Object.values(patient).filter(val => typeof val === 'number');
+
+    if (features.length === 0) {
+      setError('No numeric features found for prediction');
+      return;
+    }
+
+    setLoading(true);
+    setError(null);
+
     try {
       const res = await fetch(`${BASE_URL}/predict`, {
         method: 'POST',
@@ -32,6 +46,9 @@ const Dashboard = () => {
       setPrediction(result.prediction);
     } catch (err) {
       console.error('FastAPI error:', err);
+      setError('Prediction failed');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -44,23 +61,12 @@ const Dashboard = () => {
           <h2>First Patient</h2>
           <pre>{JSON.stringify(patients[0], null, 2)}</pre>
 
-          <button
-            onClick={() =>
-              handlePredict([
-                patients[0].Pregnancies,
-                patients[0].Glucose,
-                patients[0].BloodPressure,
-                patients[0].SkinThickness,
-                patients[0].Insulin,
-                patients[0].BMI,
-                patients[0].DiabetesPedigreeFunction,
-                patients[0].Age,
-              ])
-            }
-          >
+          <button onClick={() => handlePredict(patients[0])}>
             Predict Diabetes
           </button>
 
+          {loading && <p>Loading prediction...</p>}
+          {error && <p style={{ color: 'red' }}>{error}</p>}
           {prediction !== null && (
             <p>
               Prediction: {prediction === 1 ? 'Positive' : 'Negative'}
