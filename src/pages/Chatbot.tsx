@@ -1,10 +1,9 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { Send, Bot, User } from "lucide-react";
 import Navigation from "@/components/Navigation";
-import { supabase } from "@/lib/supabase";
 
 interface Message {
   id: number;
@@ -16,32 +15,8 @@ interface Message {
 const Chatbot = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
-  const [loading, setLoading] = useState(false);
 
-  // 🔄 Load messages from Supabase
-  useEffect(() => {
-    const loadMessages = async () => {
-      const { data, error } = await supabase
-        .from("chat_messages")
-        .select("*")
-        .order("timestamp", { ascending: true });
-
-      if (error) {
-        console.error("Error loading messages:", error.message);
-      } else {
-        const formatted = data.map((msg: any) => ({
-          ...msg,
-          timestamp: new Date(msg.timestamp),
-        }));
-        setMessages(formatted);
-      }
-    };
-
-    loadMessages();
-  }, []);
-
-  // 📤 Send message and save to Supabase
-  const handleSend = async () => {
+  const handleSend = () => {
     if (!input.trim()) return;
 
     const userMessage: Message = {
@@ -51,36 +26,22 @@ const Chatbot = () => {
       timestamp: new Date(),
     };
 
-    setMessages((prev) => [...prev, userMessage]);
+    setMessages([...messages, userMessage]);
     setInput("");
-    setLoading(true);
 
-    await supabase.from("chat_messages").insert({
-      text: userMessage.text,
-      sender: userMessage.sender,
-      timestamp: userMessage.timestamp.toISOString(),
-    });
-
-    // 🤖 Simulated bot response
-    setTimeout(async () => {
-      const botText =
+    // Simulate AI response
+    setTimeout(() => {
+      const botResponseText =
         "I understand your concern. Based on the symptoms you've described, I recommend consulting with a healthcare professional. Would you like me to help you find a specialist or schedule a teleconsultation?";
 
       const botMessage: Message = {
-        id: userMessage.id + 1,
-        text: botText,
+        id: messages.length + 2,
+        text: botResponseText,
         sender: "bot",
         timestamp: new Date(),
       };
 
       setMessages((prev) => [...prev, botMessage]);
-      setLoading(false);
-
-      await supabase.from("chat_messages").insert({
-        text: botMessage.text,
-        sender: botMessage.sender,
-        timestamp: botMessage.timestamp.toISOString(),
-      });
     }, 1000);
   };
 
@@ -135,17 +96,6 @@ const Chatbot = () => {
                 </div>
               </div>
             ))}
-
-            {loading && (
-              <div className="flex gap-3 animate-pulse">
-                <div className="w-10 h-10 rounded-full bg-gradient-primary flex items-center justify-center">
-                  <Bot className="w-5 h-5 text-white" />
-                </div>
-                <div className="bg-muted rounded-2xl px-4 py-3 text-sm text-foreground">
-                  Typing...
-                </div>
-              </div>
-            )}
           </div>
 
           {/* Input Area */}
@@ -155,7 +105,7 @@ const Chatbot = () => {
                 placeholder="Type your health question..."
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && handleSend()}
+                onKeyPress={(e) => e.key === "Enter" && handleSend()}
                 className="flex-1"
               />
               <Button onClick={handleSend} variant="hero" size="icon" className="flex-shrink-0">
