@@ -18,8 +18,8 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
-        {/* Simple navigation bar */}
-        <nav style={{ padding: "1rem", background: "#f0f0f0" }}>
+        {/* Navigation bar */}
+        <nav style={{ padding: "1rem", background: "#f0f0f0", marginBottom: "1rem" }}>
           <Link to="/" style={{ marginRight: "1rem" }}>Home</Link>
           <Link to="/chatbot" style={{ marginRight: "1rem" }}>Chatbot</Link>
           <Link to="/upload" style={{ marginRight: "1rem" }}>Upload</Link>
@@ -32,7 +32,6 @@ const App = () => (
           <Route path="/chatbot" element={<Chatbot />} />
           <Route path="/upload" element={<Upload />} />
           <Route path="/dashboard" element={<Dashboard />} />
-          {/* Catch-all route for 404 */}
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
