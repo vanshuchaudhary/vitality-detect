@@ -1,21 +1,12 @@
-import { useEffect } from 'react';
-import { supabase } from '@/lib/supabase';
+import React from 'react';
 
 const Dashboard = () => {
-  useEffect(() => {
-    const testConnection = async () => {
-      const { data, error } = await supabase.from('your_table_name').select('*');
-      if (error) {
-        console.error('Supabase error:', error.message);
-      } else {
-        console.log('Supabase data:', data);
-      }
-    };
-
-    testConnection();
-  }, []);
-
-  return <div>Dashboard</div>;
+  return (
+    <div style={{ padding: '2rem' }}>
+      <h1>Dashboard Test</h1>
+      <p>If you see this, routing and rendering are working!</p>
+    </div>
+  );
 };
 
 export default Dashboard;
