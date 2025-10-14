@@ -1,14 +1,24 @@
-import React from 'react';
+import { useEffect, useState } from 'react';
+import { supabase } from '@/lib/supabase';
 
-const Dashboard = () => {
-  console.log("Dashboard component loaded");
+interface Prediction {
+  condition: string;
+  probability: number;
+  trend: string;
+  recommendation: string;
+}
 
-  return (
-    <div style={{ padding: '2rem' }}>
-      <h1>Dashboard Test</h1>
-      <p>If you see this, routing and rendering are working!</p>
-    </div>
-  );
-};
+const [predictions, setPredictions] = useState<Prediction[]>([]);
 
-export default Dashboard;
+useEffect(() => {
+  const fetchPredictions = async () => {
+    const { data, error } = await supabase.from('predictions').select('*');
+    if (error) {
+      console.error('Error fetching predictions:', error.message);
+    } else {
+      setPredictions(data);
+    }
+  };
+
+  fetchPredictions();
+}, []);
