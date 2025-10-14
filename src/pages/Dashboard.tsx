@@ -1,12 +1,21 @@
-import React from 'react';
+import { useEffect } from 'react';
+import { supabase } from '@/lib/supabase';
 
 const Dashboard = () => {
-  return (
-    <div style={{ padding: '2rem' }}>
-      <h1>Dashboard Page</h1>
-      <p>This is a test to confirm the Dashboard is rendering correctly.</p>
-    </div>
-  );
+  useEffect(() => {
+    const testConnection = async () => {
+      const { data, error } = await supabase.from('your_table_name').select('*');
+      if (error) {
+        console.error('Supabase error:', error.message);
+      } else {
+        console.log('Supabase data:', data);
+      }
+    };
+
+    testConnection();
+  }, []);
+
+  return <div>Dashboard</div>;
 };
 
 export default Dashboard;
