@@ -23,7 +23,7 @@ const App = () => (
           <Link to="/" style={{ marginRight: "1rem" }}>Home</Link>
           <Link to="/chatbot" style={{ marginRight: "1rem" }}>Chatbot</Link>
           <Link to="/upload" style={{ marginRight: "1rem" }}>Upload</Link>
-          <Link to="/dashboard">Dashboard</Link>
+          <Link to="/dashboard" style={{ marginRight: "1rem" }}>Dashboard</Link>
         </nav>
 
         {/* Page routes */}
