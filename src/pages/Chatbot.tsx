@@ -4,6 +4,8 @@ import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { Send, Bot, User } from "lucide-react";
 import Navigation from "@/components/Navigation";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/components/ui/use-toast";
 
 interface Message {
   id: number;
@@ -15,9 +17,11 @@ interface Message {
 const Chatbot = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const { toast } = useToast();
 
-  const handleSend = () => {
-    if (!input.trim()) return;
+  const handleSend = async () => {
+    if (!input.trim() || isLoading) return;
 
     const userMessage: Message = {
       id: messages.length + 1,
@@ -26,23 +30,42 @@ const Chatbot = () => {
       timestamp: new Date(),
     };
 
-    setMessages([...messages, userMessage]);
+    const updatedMessages = [...messages, userMessage];
+    setMessages(updatedMessages);
     setInput("");
+    setIsLoading(true);
 
-    // Simulate AI response
-    setTimeout(() => {
-      const botResponseText =
-        "I understand your concern. Based on the symptoms you've described, I recommend consulting with a healthcare professional. Would you like me to help you find a specialist or schedule a teleconsultation?";
+    try {
+      // Prepare messages for OpenAI API
+      const chatMessages = updatedMessages.map(msg => ({
+        role: msg.sender === "user" ? "user" : "assistant",
+        content: msg.text
+      }));
+
+      const { data, error } = await supabase.functions.invoke('chat-ai', {
+        body: { messages: chatMessages }
+      });
+
+      if (error) throw error;
 
       const botMessage: Message = {
         id: messages.length + 2,
-        text: botResponseText,
+        text: data.message,
         sender: "bot",
         timestamp: new Date(),
       };
 
       setMessages((prev) => [...prev, botMessage]);
-    }, 1000);
+    } catch (error) {
+      console.error('Error getting AI response:', error);
+      toast({
+        title: "Error",
+        description: "Failed to get AI response. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -105,10 +128,17 @@ const Chatbot = () => {
                 placeholder="Type your health question..."
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
-                onKeyPress={(e) => e.key === "Enter" && handleSend()}
+                onKeyPress={(e) => e.key === "Enter" && !isLoading && handleSend()}
                 className="flex-1"
+                disabled={isLoading}
               />
-              <Button onClick={handleSend} variant="hero" size="icon" className="flex-shrink-0">
+              <Button 
+                onClick={handleSend} 
+                variant="hero" 
+                size="icon" 
+                className="flex-shrink-0"
+                disabled={isLoading}
+              >
                 <Send className="w-4 h-4" />
               </Button>
             </div>
