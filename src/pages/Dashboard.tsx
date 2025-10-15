@@ -11,17 +11,23 @@ const DashboardPrediction = () => {
   const handlePredict = async () => {
     setLoading(true);
     try {
-      const features = [5, 120, 70, 20, 79, 25.0, 0.5, 33]; // example input
+      // Example features: [Pregnancies, Glucose, BP, SkinThickness, Insulin, BMI, DiabetesPedigree, Age]
+      const features = [5, 120, 70, 20, 79, 25.0, 0.5, 33];
       const res = await fetch(`${BASE_URL}/predict`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ features }),
       });
+      
+      if (!res.ok) {
+        throw new Error(`API error: ${res.status}`);
+      }
+      
       const result = await res.json();
-      setPrediction(result.prediction === 1 ? "Positive" : "Negative");
+      setPrediction(`${result.risk_level} Risk (${(result.probability * 100).toFixed(1)}% probability)`);
     } catch (err) {
       console.error("Prediction failed:", err);
-      setPrediction("Error");
+      setPrediction("Error: Make sure FastAPI server is running at http://127.0.0.1:8000");
     } finally {
       setLoading(false);
     }
