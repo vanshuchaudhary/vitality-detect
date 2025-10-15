@@ -2,7 +2,10 @@ import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Brain } from "lucide-react";
 
-const BASE_URL = "http://127.0.0.1:8000";
+// Change this to your deployed API URL after deployment
+// For local development: http://127.0.0.1:8000
+// For production: https://your-api-url.onrender.com or your deployed URL
+const BASE_URL = import.meta.env.VITE_API_URL || "http://127.0.0.1:8000";
 
 const DashboardPrediction = () => {
   const [prediction, setPrediction] = useState<string | null>(null);
